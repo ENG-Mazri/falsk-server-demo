@@ -1,11 +1,10 @@
 from flask import Flask
+from blueprints.demo.demo import demo_bp
+
 
 app = Flask(__name__)
-                    
-@app.route('/')
-def hello():
-    return 'Sup there!'
+app.register_blueprint(demo_bp)
 
-@app.route('/test')
-def hello2():
-    return 'testy testy...'
+
+if __name__ == '__main__':
+    app.run(debug=True)
