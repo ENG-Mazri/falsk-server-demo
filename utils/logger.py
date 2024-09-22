@@ -9,12 +9,12 @@ def warn(str):
     return print(CRED + str + CEND)
 
 def success(str):
-    CRED = '\033[32m'
+    CRED = '\033[92m'
     CEND = '\033[0m'
     return print(CRED + str + CEND)
 
 def info(str):
-    CRED = '\033[34m'
+    CRED = '\033[94m'
     CEND = '\033[0m'
     return print(CRED + str + CEND)
 
