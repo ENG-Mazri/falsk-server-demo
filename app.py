@@ -5,7 +5,6 @@ from blueprints.ifc.ifc import ifc_bp
 app = Flask(__name__)
 app.register_blueprint(demo_bp)
 app.register_blueprint(ifc_bp)
-app.debug = True
 
 if __name__ == '__main__':
     app.run(debug=True)
