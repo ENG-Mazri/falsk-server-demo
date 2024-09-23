@@ -82,3 +82,12 @@ class Patcher:
             and element.ContainedInStructure[0].RelatingStructure.is_a("IfcBuildingStorey")
             and element.ContainedInStructure[0].RelatingStructure.GlobalId == storey.GlobalId
         )
+
+
+# if element.is_a("IfcSpace"): 
+#     return (
+#         element.Decomposes
+#         and element.Decomposes[0].RelatingObject.is_a("IfcBuildingStorey")
+#         and element.Decomposes[0].RelatingObject.GlobalId == storey.GlobalId
+#     ) 
+# else:

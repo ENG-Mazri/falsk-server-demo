@@ -7,6 +7,8 @@ import utils.logger as Logger
 import numpy as np
 import base64
 import os
+import zipfile
+import utils.filesManager as FilesManager
 
 ifc_bp = Blueprint("IFC BP", __name__, template_folder="templates")
 
@@ -34,6 +36,7 @@ def extractHandler():
     category = request.form.get('category')
     file.save('assets/model.ifc')
     name = file.filename
+    assets_path = os.path.join(os.getcwd(), "assets")
 
     # try:
     output = ifcpatch.execute({
@@ -53,6 +56,7 @@ def extractHandler():
     f.close()
     Logger.success("Extracting finished!")
     encoded_data = base64.b64encode(bytes(byte_array)) # Encode bytearray to base64
+    FilesManager.deleteDirContent(assets_path)
     return encoded_data
     # return send_file("assets/output.ifc", download_name=name, mimetype='application/x-step', as_attachment=True)
     # except Exception as error:
@@ -66,25 +70,41 @@ def splitHandler():
     filter = request.form.get('filter')
     file.save('assets/model.ifc')
     name = file.filename
-    assets_path = os.path.join(os.getcwd(), "assets").replace("\\", "/")
+    assets_path = os.path.join(os.getcwd(), "assets")
+    # FilesManager.deleteDirContent(assets_path)
     # try:
-    output = ifcpatch.execute({
+    ifcpatch.execute({
         "input": "assets/model.ifc",
         "file": ifcopenshell.open("assets/model.ifc"),
         "recipe": "SplitByBuildingStorey",
         "arguments": [assets_path],
     })
 
-    # ifcpatch.write(output)
+
+    with zipfile.ZipFile('assets/stories.zip', 'w') as zipped_f:
+        for filename in os.listdir(assets_path):
+            if filename in ["model.ifc", "output.ifc", "stories.zip"]:
+                continue
+
+            file_path = os.path.join(assets_path, filename) 
+            file = open(file_path, 'rb')
+            blob_data = file.read()
+            data = bytearray(blob_data)
+            zipped_f.writestr(filename, data)
+            file.close()
+
+    # ifcpatch.write(output) 
 
     # output.write("assets/output.ifc", zipped=False)
 
-    f = open("assets/output.ifc", 'rb')
+    f = open("assets/stories.zip", 'rb')
     blob_data = f.read()
     byte_array = bytearray(blob_data)
     f.close()
-    Logger.success("Extracting finished!")
+    Logger.success("Splitting finished!")
     encoded_data = base64.b64encode(bytes(byte_array))
+    
+    FilesManager.deleteDirContent(assets_path)
     return encoded_data
 
 
@@ -95,6 +115,7 @@ def upgradeHandler():
     to_schema = request.form.get('schema')
     file.save('assets/model.ifc')
     name = file.filename
+    assets_path = os.path.join(os.getcwd(), "assets")
 
     try: 
         output = ifcpatch.execute({
@@ -110,10 +131,8 @@ def upgradeHandler():
     except Exception as error:
         Logger.error("Error when upgrading model :(")
     
-
+    FilesManager.deleteDirContent(assets_path)
     return 'Finished...'
-
-
 
 
 
